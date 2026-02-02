@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Invaders</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="ui-layer">
+            <div class="score-board">SCORE: <span id="scoreEl">0</span></div>
+            <div id="startScreen" class="overlay">
+                <h1>SPACE INVADERS</h1>
+                <p>Press <span class="key-highlight">SPACE</span> to Start</p>
+            </div>
+            <div id="gameOverScreen" class="overlay hidden">
+                <h1>GAME OVER</h1>
+                <p>Final Score: <span id="finalScoreEl">0</span></p>
+                <p>Press <span class="key-highlight">SPACE</span> to Restart</p>
+            </div>
+            <div class="ai-controls" id="aiPanel">
+                <div class="panel-header">
+                    <h3><span style="color:var(--neon-pink)">></span> DeepRL NEXUS</h3>
+                    <button id="togglePanelBtn" class="toggle-btn">−</button>
+                </div>
+                <div class="panel-content">
+                    <div class="model-display">Model: <span id="modelName">None</span></div>
+                    <div>Epsilon: <span id="epsilonStat">1.000</span></div>
+                    <div>Reward: <span id="rewardStat">0</span></div>
+                    <button id="trainBtn">INITIATE TRAINING</button>
+                    <button id="saveBtn">INITIALIZE SAVE</button>
+                    <button id="loadBtn">LOAD SEQUENCE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="game.js"></script>
+    <script src="agent.js"></script>
+    <script>
+        // Init Agent after scripts load
+        window.addEventListener('load', () => {
+            const agent = new DQNAgent(window.game);
+            document.getElementById('trainBtn').addEventListener('click', () => {
+                agent.toggleTraining();
+            });
+            document.getElementById('saveBtn').addEventListener('click', () => {
+                const name = prompt("Enter model name (optional):");
+                agent.save(name);
+            });
+            document.getElementById('loadBtn').addEventListener('click', () => {
+                const name = prompt("Enter model name to load (leave empty for latest):");
+                agent.load(name);
+            });
+
+            // Toggle Panel Logic
+            const panel = document.getElementById('aiPanel');
+            const toggleBtn = document.getElementById('togglePanelBtn');
+            toggleBtn.addEventListener('click', () => {
+                panel.classList.toggle('collapsed');
+                toggleBtn.textContent = panel.classList.contains('collapsed') ? '+' : '−';
+            });
+        });
+    </script>
+</body>
+
+</html>
